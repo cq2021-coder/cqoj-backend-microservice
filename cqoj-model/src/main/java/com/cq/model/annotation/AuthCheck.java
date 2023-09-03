@@ -1,4 +1,4 @@
-package com.cq.common.annotation;
+package com.cq.model.annotation;
 
 
 import com.cq.model.enums.UserRoleEnum;
