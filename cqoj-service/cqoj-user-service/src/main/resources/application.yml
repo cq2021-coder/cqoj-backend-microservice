@@ -1,0 +1,38 @@
+server:
+  port: 3039
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        # cookie 6\u5C0F\u65F6\u540E\u8FC7\u671F
+        max-age: 21600
+spring:
+  application:
+    name: cqoj-user-service
+  profiles:
+    # \u9009\u62E9\u914D\u7F6E\u6587\u4EF6
+    active: test
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  # session \u5929\u8FC7\u671F
+  session:
+    store-type: redis
+    timeout: 2592000
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 5MB
+mybatis-plus:
+  global-config:
+    db-config:
+      # \u5168\u5C40\u903B\u8F91\u5220\u9664\u7684\u5B9E\u4F53\u5B57\u6BB5\u540D
+      logic-delete-field: isDelete
+      # \u903B\u8F91\u5DF2\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 1\uFF09
+      logic-delete-value: 1
+      # \u903B\u8F91\u672A\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 0\uFF09
+      logic-not-delete-value: 0
+      id-type: assign_id
+    banner: off
