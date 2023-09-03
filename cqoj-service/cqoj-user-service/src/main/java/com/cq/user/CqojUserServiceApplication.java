@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.cq")
+@ComponentScan("com.cq")
 public class CqojUserServiceApplication {
 
 	public static void main(String[] args) {

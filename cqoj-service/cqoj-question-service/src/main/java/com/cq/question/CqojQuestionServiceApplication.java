@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.cq")
+@ComponentScan("com.cq")
 public class CqojQuestionServiceApplication {
 
 	public static void main(String[] args) {
