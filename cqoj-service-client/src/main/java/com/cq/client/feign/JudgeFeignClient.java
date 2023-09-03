@@ -1,6 +1,8 @@
 package com.cq.client.feign;
 
 
+import com.cq.model.entity.QuestionSubmit;
+
 /**
  * 判题服务
  *
@@ -9,4 +11,5 @@ package com.cq.client.feign;
  */
 public interface JudgeFeignClient {
 
+    void doJudge(QuestionSubmit questionSubmit);
 }
