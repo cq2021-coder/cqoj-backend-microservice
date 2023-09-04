@@ -33,9 +33,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
+ * 题目提交服务impl
+ *
  * @author 程崎
- * @description 针对表【question_submit(题目提交)】的数据库操作Service实现
- * @createDate 2023-08-08 21:24:55
+ * @since 2023/09/04
  */
 @Service
 public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper, QuestionSubmit>
@@ -133,7 +134,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 脱敏：仅本人和管理员能看见自己（提交 userId 和登录用户 id 不同）提交的代码
         long userId = loginUser.getId();
         // 处理脱敏
-        if (userId != questionSubmit.getUserId() && !userFeignClient.isAdmin(loginUser)) {
+        if (userId != questionSubmit.getUserId() && userFeignClient.isNotAdmin(loginUser)) {
             questionSubmitVO.setCode(null);
         }
         return questionSubmitVO;

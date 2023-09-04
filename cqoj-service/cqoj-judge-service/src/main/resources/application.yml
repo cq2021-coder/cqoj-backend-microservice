@@ -8,7 +8,7 @@ server:
         max-age: 21600
 spring:
   application:
-    name: cqoj-question-service
+    name: cqoj-judge-service
   profiles:
     # 选择配置文件
     active: test

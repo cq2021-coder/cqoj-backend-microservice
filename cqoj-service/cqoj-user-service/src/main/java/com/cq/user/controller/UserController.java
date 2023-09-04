@@ -30,7 +30,6 @@ import java.util.List;
  * @since 2023/07/29
  */
 @RestController
-@RequestMapping("/user")
 @Slf4j
 public class UserController {
 

@@ -4,18 +4,18 @@ server:
     context-path: /api/user
     session:
       cookie:
-        # cookie 6\u5C0F\u65F6\u540E\u8FC7\u671F
+        # cookie 6小时后过期
         max-age: 21600
 spring:
   application:
     name: cqoj-user-service
   profiles:
-    # \u9009\u62E9\u914D\u7F6E\u6587\u4EF6
+    # 选择配置文件
     active: test
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  # session \u5929\u8FC7\u671F
+  # session 天过期
   session:
     store-type: redis
     timeout: 2592000
@@ -28,11 +28,11 @@ spring:
 mybatis-plus:
   global-config:
     db-config:
-      # \u5168\u5C40\u903B\u8F91\u5220\u9664\u7684\u5B9E\u4F53\u5B57\u6BB5\u540D
+      # 全局逻辑删除的实体字段名
       logic-delete-field: isDelete
-      # \u903B\u8F91\u5DF2\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 1\uFF09
+      # 逻辑已删除值（默认为 1）
       logic-delete-value: 1
-      # \u903B\u8F91\u672A\u5220\u9664\u503C\uFF08\u9ED8\u8BA4\u4E3A 0\uFF09
+      # 逻辑未删除值（默认为 0）
       logic-not-delete-value: 0
       id-type: assign_id
     banner: off

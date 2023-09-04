@@ -4,6 +4,11 @@ package com.cq.client.feign;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.cq.model.entity.Question;
 import com.cq.model.entity.QuestionSubmit;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * 题目服务
@@ -11,10 +16,15 @@ import com.cq.model.entity.QuestionSubmit;
  * @author 程崎
  * @since 2023/09/03
  */
+@FeignClient(name = "cqoj-question-service", path = "/api/question/inner")
 public interface QuestionFeignClient {
+
+    @PostMapping("/get/wrapper")
     Question getOne(Wrapper<Question> queryWrapper);
 
-    void updateById(QuestionSubmit questionSubmitUpdate);
+    @PostMapping("/question-submit/update")
+    void updateById(@RequestBody QuestionSubmit questionSubmitUpdate);
 
-    QuestionSubmit selectById(Long id);
+    @GetMapping("/question-submit/get/id")
+    QuestionSubmit selectById(@RequestParam("id") Long id);
 }

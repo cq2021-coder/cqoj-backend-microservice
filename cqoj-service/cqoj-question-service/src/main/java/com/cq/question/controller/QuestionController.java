@@ -36,7 +36,6 @@ import java.util.List;
  * @since 2023/08/08
  */
 @RestController
-@RequestMapping("/question")
 @Slf4j
 public class QuestionController {
 
@@ -100,7 +99,7 @@ public class QuestionController {
         }
 
         // 仅本人或管理员可删除
-        if (!oldQuestion.getUserId().equals(user.getId()) && !userFeignClient.isAdmin(session)) {
+        if (!oldQuestion.getUserId().equals(user.getId()) && userFeignClient.isNotAdmin(user)) {
             throw new BusinessException(ResultCodeEnum.NO_AUTH_ERROR);
         }
         return CommonResponse.success(questionService.removeById(id));
@@ -165,7 +164,7 @@ public class QuestionController {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR);
         }
         User loginUser = userFeignClient.getLoginUser(session);
-        if (!question.getUserId().equals(loginUser.getId()) && !userFeignClient.isAdmin(loginUser)) {
+        if (!question.getUserId().equals(loginUser.getId()) && userFeignClient.isNotAdmin(loginUser)) {
             throw new BusinessException(ResultCodeEnum.NO_AUTH_ERROR);
         }
         return CommonResponse.success(question);
@@ -249,7 +248,7 @@ public class QuestionController {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR);
         }
         // 仅本人或管理员可编辑
-        if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userFeignClient.isAdmin(loginUser)) {
+        if (!oldQuestion.getUserId().equals(loginUser.getId()) && userFeignClient.isNotAdmin(loginUser)) {
             throw new BusinessException(ResultCodeEnum.NO_AUTH_ERROR);
         }
         return CommonResponse.success(questionService.updateById(question));
