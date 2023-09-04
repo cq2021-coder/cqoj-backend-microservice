@@ -6,6 +6,7 @@ server:
       cookie:
         # cookie 6小时后过期
         max-age: 21600
+        path: /api
 spring:
   application:
     name: cqoj-question-service
