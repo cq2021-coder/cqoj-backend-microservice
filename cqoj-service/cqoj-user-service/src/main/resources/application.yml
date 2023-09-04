@@ -36,3 +36,7 @@ mybatis-plus:
       logic-not-delete-value: 0
       id-type: assign_id
     banner: off
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

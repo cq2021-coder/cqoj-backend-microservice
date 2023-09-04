@@ -40,4 +40,7 @@ mybatis-plus:
 # 代码沙箱配置
 codesandbox:
   type: remote
-
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

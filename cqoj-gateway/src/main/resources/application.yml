@@ -1,0 +1,23 @@
+server:
+  port: 3050
+spring:
+  application:
+    name: cqoj-gateway
+  profiles:
+    # 选择配置文件
+    active: test
+  cloud:
+    gateway:
+      routes:
+        - id: cqoj-user-service
+          uri: lb://cqoj-user-service
+          predicates:
+            - Path=/api/user/**
+        - id: cqoj-question-service
+          uri: lb://cqoj-question-service
+          predicates:
+            - Path=/api/question/**
+        - id: cqoj-judge-service
+          uri: lb://cqoj-judge-service
+          predicates:
+            - Path=/api/judge/**
