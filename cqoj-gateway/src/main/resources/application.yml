@@ -1,0 +1,34 @@
+server:
+  port: 3050
+spring:
+  application:
+    name: cqoj-gateway
+  profiles:
+    # 选择配置文件
+    active: test
+  cloud:
+    gateway:
+      routes:
+        - id: cqoj-user-service
+          uri: lb://cqoj-user-service
+          predicates:
+            - Path=/api/user/**
+        - id: cqoj-question-service
+          uri: lb://cqoj-question-service
+          predicates:
+            - Path=/api/question/**
+        - id: cqoj-judge-service
+          uri: lb://cqoj-judge-service
+          predicates:
+            - Path=/api/judge/**
+knife4j:
+  gateway:
+    # ① 第一个配置，开启gateway聚合组件
+    enabled: true
+    # ② 第二行配置，设置聚合模式采用discover服务发现的模式
+    strategy: discover
+    discover:
+      # ③ 第三行配置，开启discover模式
+      enabled: true
+      # ④ 第四行配置，聚合子服务全部为Swagger2规范的文档
+      version: swagger2
