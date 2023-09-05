@@ -1,7 +1,6 @@
 package com.cq.client.feign;
 
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.cq.model.entity.Question;
 import com.cq.model.entity.QuestionSubmit;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -19,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "cqoj-question-service", path = "/api/question/inner")
 public interface QuestionFeignClient {
 
-    @PostMapping("/get/wrapper")
-    Question getOne(Wrapper<Question> queryWrapper);
+    @GetMapping("/get/id")
+    Question getOne(@RequestParam("questionId") Long questionId);
 
     @PostMapping("/question-submit/update")
     void updateById(@RequestBody QuestionSubmit questionSubmitUpdate);

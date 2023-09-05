@@ -178,10 +178,8 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         this.page(questionPage, queryWrapper);
         Page<QuestionManageVO> questionManageVoPage = new Page<>();
         BeanUtils.copyProperties(questionPage, questionManageVoPage, "records");
-        List<Long> userIdList = questionPage.getRecords().stream().map(Question::getUserId).collect(Collectors.toList());
-        List<User> userList = userFeignClient.list(
-                Wrappers.lambdaQuery(User.class).select(User::getUserName, User::getId).in(User::getId, userIdList)
-        );
+        Set<Long> userIdSet = questionPage.getRecords().stream().map(Question::getUserId).collect(Collectors.toSet());
+        List<User> userList = userFeignClient.list(userIdSet);
         Map<Long, List<User>> userIdToName = userList.stream().collect(Collectors.groupingBy(User::getId));
         questionManageVoPage.setRecords(
                 questionPage.getRecords().stream().map(question -> {

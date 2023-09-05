@@ -1,7 +1,6 @@
 package com.cq.judge.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cq.client.feign.QuestionFeignClient;
 import com.cq.common.exception.BusinessException;
 import com.cq.common.response.ResultCodeEnum;
@@ -52,9 +51,7 @@ public class JudgeServiceImpl implements JudgeService {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "提交信息不存在");
         }
         Long questionId = questionSubmit.getQuestionId();
-        Question question = questionFeignClient.getOne(
-                Wrappers.lambdaQuery(Question.class).eq(Question::getId, questionId).select(Question::getJudgeCase, Question::getJudgeConfig)
-        );
+        Question question = questionFeignClient.getOne(questionId);
         if (ObjectUtils.isEmpty(question)) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "题目不存在");
         }

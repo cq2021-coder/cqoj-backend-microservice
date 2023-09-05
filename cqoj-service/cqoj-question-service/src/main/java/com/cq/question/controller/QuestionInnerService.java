@@ -1,6 +1,6 @@
 package com.cq.question.controller;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cq.model.entity.Question;
 import com.cq.model.entity.QuestionSubmit;
 import com.cq.question.service.QuestionService;
@@ -19,9 +19,11 @@ public class QuestionInnerService {
     @Resource
     private QuestionSubmitService questionSubmitService;
 
-    @PostMapping("/get/wrapper")
-    public Question getOne(Wrapper<Question> queryWrapper) {
-        return questionService.getOne(queryWrapper);
+    @PostMapping("/get/id")
+    public Question getOne(Long questionId) {
+        return questionService.getOne(
+                Wrappers.lambdaQuery(Question.class).eq(Question::getId, questionId).select(Question::getJudgeCase, Question::getJudgeConfig)
+        );
     }
 
     @PostMapping("/question-submit/update")

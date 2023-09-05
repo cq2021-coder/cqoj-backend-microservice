@@ -1,9 +1,12 @@
 package com.cq.user.controller;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cq.model.entity.User;
 import com.cq.user.service.UserService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.Collection;
@@ -22,13 +25,13 @@ public class UserInnerController {
     }
 
     @GetMapping("/get/ids")
-    public List<User> listByIds(Collection<Long> userIds) {
-        return userService.listByIds(userIds);
+    public List<User> listByIds(@RequestParam("userIdList") Collection<Long> userIdList) {
+        return userService.listByIds(userIdList);
     }
 
-    @PostMapping("/get/list")
-    List<User> list(@RequestBody Wrapper<User> queryWrapper) {
-        return userService.list(queryWrapper);
+    @GetMapping("/get/list")
+    public List<User> list(@RequestParam("userIdList") Collection<Long> userIdList) {
+        return userService.list(Wrappers.lambdaQuery(User.class).select(User::getUserName, User::getId).in(User::getId, userIdList));
     }
 
 }

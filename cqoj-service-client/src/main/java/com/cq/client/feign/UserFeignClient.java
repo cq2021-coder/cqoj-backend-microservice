@@ -1,7 +1,6 @@
 package com.cq.client.feign;
 
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.cq.common.exception.BusinessException;
 import com.cq.common.response.ResultCodeEnum;
 import com.cq.model.entity.User;
@@ -10,8 +9,6 @@ import com.cq.model.vo.UserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
@@ -33,10 +30,10 @@ public interface UserFeignClient {
     User getById(@RequestParam("userId") Long userId);
 
     @GetMapping("/get/ids")
-    List<User> listByIds(@RequestParam("userIds") Collection<Long> userIds);
+    List<User> listByIds(@RequestParam("userIdList") Collection<Long> userIdList);
 
-    @PostMapping("/get/list")
-    List<User> list(@RequestBody Wrapper<User> queryWrapper);
+    @GetMapping("/get/list")
+    List<User> list(@RequestParam("userIdList") Collection<Long> userIdList);
 
     /**
      * 获取当前登录用户
