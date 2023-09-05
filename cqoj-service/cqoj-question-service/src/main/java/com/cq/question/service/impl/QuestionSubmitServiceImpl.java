@@ -3,9 +3,9 @@ package com.cq.question.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cq.client.feign.JudgeFeignClient;
 import com.cq.client.feign.UserFeignClient;
 import com.cq.common.constants.CommonConstant;
+import com.cq.common.constants.MqConstant;
 import com.cq.common.exception.BusinessException;
 import com.cq.common.response.ResultCodeEnum;
 import com.cq.common.utils.SqlUtils;
@@ -23,13 +23,13 @@ import com.cq.question.service.QuestionSubmitService;
 import com.google.common.base.CaseFormat;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +48,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private UserFeignClient userFeignClient;
 
     @Resource
-    private JudgeFeignClient judgeFeignClient;
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 提交题目
@@ -87,7 +87,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if (!save) {
             throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "数据插入失败");
         }
-        CompletableFuture.runAsync(() -> judgeFeignClient.doJudge(questionSubmit));
+        rabbitTemplate.convertAndSend(MqConstant.EXCHANGE_JUDGE_DIRECT, MqConstant.ROUTING_JUDGE, questionSubmit);
+//        CompletableFuture.runAsync(() -> judgeFeignClient.doJudge(questionSubmit));
         return questionSubmit.getId();
     }
 

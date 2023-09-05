@@ -9,6 +9,7 @@ import com.cq.model.dto.questionsubmit.JudgeInfo;
 import com.cq.model.entity.Question;
 import com.cq.model.enums.JudgeInfoMessageEnum;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -17,12 +18,12 @@ public class JavaJudgeStrategy implements JudgeStrategy {
 
     @Override
     public JudgeInfo doJudge(JudgeContext judgeContext) {
-        JudgeInfo judgeInfo = judgeContext.getJudgeInfo();
+        JudgeInfo judgeInfo = ObjectUtil.defaultIfNull(judgeContext.getJudgeInfo(), new JudgeInfo());
 
-        List<String> outputList = judgeContext.getOutputList();
-        List<String> outputListResult = judgeContext.getOutputListResult();
+        List<String> outputList = ObjectUtil.defaultIfNull(judgeContext.getOutputList(), new ArrayList<>());
+        List<String> outputListResult = ObjectUtil.defaultIfNull(judgeContext.getOutputListResult(), new ArrayList<>());
 
-        Question question = judgeContext.getQuestion();
+        Question question = ObjectUtil.defaultIfNull(judgeContext.getQuestion(), new Question());
 
         JudgeInfoMessageEnum judgeInfoMessage;
 

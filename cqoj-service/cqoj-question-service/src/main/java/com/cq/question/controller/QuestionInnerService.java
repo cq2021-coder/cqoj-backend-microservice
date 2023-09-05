@@ -19,7 +19,7 @@ public class QuestionInnerService {
     @Resource
     private QuestionSubmitService questionSubmitService;
 
-    @PostMapping("/get/id")
+    @GetMapping("/get/id")
     public Question getOne(Long questionId) {
         return questionService.getOne(
                 Wrappers.lambdaQuery(Question.class).eq(Question::getId, questionId).select(Question::getJudgeCase, Question::getJudgeConfig)

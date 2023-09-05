@@ -15,6 +15,11 @@ spring:
         server-addr: 192.168.48.128:8848
         username: nacos
         password: nacos
+  rabbitmq:
+    host: 192.168.48.128
+    port: 5672
+    username: guest
+    password: guest
 
 mybatis-plus:
   configuration:
