@@ -12,6 +12,7 @@ import com.cq.model.enums.UserRoleEnum;
 import com.cq.model.vo.LoginUserVO;
 import com.cq.model.vo.UserVO;
 import com.cq.user.service.UserService;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@Api(tags = "user")
 public class UserController {
 
     /**

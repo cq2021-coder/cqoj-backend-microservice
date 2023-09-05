@@ -21,6 +21,7 @@ import com.cq.model.vo.QuestionVO;
 import com.cq.question.service.QuestionService;
 import com.cq.question.service.QuestionSubmitService;
 import com.google.gson.Gson;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@Api(tags = "question")
 public class QuestionController {
 
     @Resource
