@@ -29,6 +29,10 @@ import com.cq.question.service.QuestionSubmitService;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RRateLimiter;
+import org.redisson.api.RateIntervalUnit;
+import org.redisson.api.RateType;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -288,6 +292,8 @@ public class QuestionController {
         return CommonResponse.success(QuestionSubmitLanguageEnum.getValues());
     }
 
+    @Resource
+    private RedissonClient redisson;
 
     /**
      * 提交题目
@@ -302,6 +308,11 @@ public class QuestionController {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
         final User loginUser = userFeignClient.getLoginUser(session);
+        RRateLimiter rateLimiter = redisson.getRateLimiter(loginUser.getId().toString());
+        rateLimiter.trySetRate(RateType.PER_CLIENT, 1, 2, RateIntervalUnit.SECONDS);
+        if (!rateLimiter.tryAcquire()) {
+            return CommonResponse.error(ResultCodeEnum.FORBIDDEN_ERROR, "提交过于频繁，请稍后重试");
+        }
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return CommonResponse.success(questionSubmitId);
     }
