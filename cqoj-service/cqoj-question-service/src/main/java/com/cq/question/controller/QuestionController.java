@@ -1,19 +1,26 @@
 package com.cq.question.controller;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cq.client.feign.UserFeignClient;
 import com.cq.common.exception.BusinessException;
 import com.cq.common.request.DeleteRequest;
 import com.cq.common.response.CommonResponse;
 import com.cq.common.response.ResultCodeEnum;
+import com.cq.common.utils.CopyUtil;
 import com.cq.model.annotation.AuthCheck;
 import com.cq.model.dto.question.*;
+import com.cq.model.dto.questionsubmit.JudgeInfo;
 import com.cq.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.cq.model.dto.questionsubmit.QuestionSubmitQueryPageRequest;
 import com.cq.model.entity.Question;
+import com.cq.model.entity.QuestionSubmit;
 import com.cq.model.entity.User;
 import com.cq.model.enums.QuestionSubmitLanguageEnum;
+import com.cq.model.enums.QuestionSubmitStatusEnum;
 import com.cq.model.enums.UserRoleEnum;
+import com.cq.model.vo.JudgeVO;
 import com.cq.model.vo.QuestionManageVO;
 import com.cq.model.vo.QuestionSubmitViewVO;
 import com.cq.model.vo.QuestionVO;
@@ -31,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+
 
 /**
  * 题目接口
@@ -319,5 +327,22 @@ public class QuestionController {
         String title = questionSubmitQueryRequest.getTitle();
         String language = questionSubmitQueryRequest.getLanguage();
         return CommonResponse.success(questionSubmitService.listQuestionSubmitByPage(title, language, pageIndex, size));
+    }
+
+    @GetMapping("/question-submit/get/id")
+    public CommonResponse<JudgeVO> getJudgeResult(Long questionSubmitId) {
+        QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
+        if (ObjectUtil.isEmpty(questionSubmit)) {
+            return CommonResponse.success(new JudgeVO(), "数据为空");
+        }
+        Integer status = questionSubmit.getStatus();
+        if (QuestionSubmitStatusEnum.WAITING.getValue().equals(status)||QuestionSubmitStatusEnum.RUNNING.getValue().equals(status)) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "判题中");
+        }
+        JudgeVO judgeVO = CopyUtil.copy(questionSubmit, JudgeVO.class);
+        JudgeInfo judgeInfo = JSONUtil.toBean(questionSubmit.getJudgeInfo(), JudgeInfo.class);
+        judgeVO.setTime(ObjectUtil.defaultIfNull(judgeInfo.getTime(), 0) + "ms");
+        judgeVO.setMessage(judgeInfo.getMessage());
+        return CommonResponse.success(judgeVO);
     }
 }
