@@ -9,14 +9,13 @@ import com.cq.common.response.ResultCodeEnum;
 import com.cq.model.annotation.AuthCheck;
 import com.cq.model.dto.question.*;
 import com.cq.model.dto.questionsubmit.QuestionSubmitAddRequest;
-import com.cq.model.dto.questionsubmit.QuestionSubmitQueryRequest;
+import com.cq.model.dto.questionsubmit.QuestionSubmitQueryPageRequest;
 import com.cq.model.entity.Question;
-import com.cq.model.entity.QuestionSubmit;
 import com.cq.model.entity.User;
 import com.cq.model.enums.QuestionSubmitLanguageEnum;
 import com.cq.model.enums.UserRoleEnum;
 import com.cq.model.vo.QuestionManageVO;
-import com.cq.model.vo.QuestionSubmitVO;
+import com.cq.model.vo.QuestionSubmitViewVO;
 import com.cq.model.vo.QuestionVO;
 import com.cq.question.service.QuestionService;
 import com.cq.question.service.QuestionSubmitService;
@@ -24,7 +23,10 @@ import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -298,12 +300,8 @@ public class QuestionController {
 
     /**
      * 分页获取题目提交列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
-     *
-     * @param questionSubmitQueryRequest 题目提交查询请求
-     * @param session                    会话
-     * @return {@link CommonResponse}<{@link Page}<{@link QuestionSubmitVO}>>
      */
-    @PostMapping("/question-submit/list/page")
+    /*@PostMapping("/question-submit/list/page")
     public CommonResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpSession session) {
         long current = questionSubmitQueryRequest.getCurrent();
         long size = questionSubmitQueryRequest.getPageSize();
@@ -313,6 +311,13 @@ public class QuestionController {
         final User loginUser = userFeignClient.getLoginUser(session);
         // 返回脱敏信息
         return CommonResponse.success(questionSubmitService.getQuestionSubmitVoPage(questionSubmitPage, loginUser));
+    }*/
+    @GetMapping("/question-submit/list/page")
+    public CommonResponse<Page<QuestionSubmitViewVO>> listQuestionSubmitByPage(QuestionSubmitQueryPageRequest questionSubmitQueryRequest) {
+        long size = questionSubmitQueryRequest.getPageSize();
+        long pageIndex = (questionSubmitQueryRequest.getCurrent() - 1) * size;
+        String title = questionSubmitQueryRequest.getTitle();
+        String language = questionSubmitQueryRequest.getLanguage();
+        return CommonResponse.success(questionSubmitService.listQuestionSubmitByPage(title, language, pageIndex, size));
     }
-
 }

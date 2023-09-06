@@ -25,6 +25,7 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.UUID;
 
 import static com.cq.common.constants.UserConstant.USER_LOGIN_STATE;
 
@@ -86,6 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             User user = new User();
             user.setUserAccount(userAccount);
             user.setUserPassword(encryptPassword);
+            user.setUserName("用户-" + UUID.randomUUID());
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ResultCodeEnum.SYSTEM_ERROR, "注册失败，数据库错误");
