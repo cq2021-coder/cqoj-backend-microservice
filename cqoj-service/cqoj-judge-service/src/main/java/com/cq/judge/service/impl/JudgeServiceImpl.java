@@ -1,5 +1,6 @@
 package com.cq.judge.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.cq.client.feign.QuestionFeignClient;
 import com.cq.common.exception.BusinessException;
@@ -20,6 +21,7 @@ import com.cq.model.enums.QuestionSubmitLanguageEnum;
 import com.cq.model.enums.QuestionSubmitStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -46,15 +48,18 @@ public class  JudgeServiceImpl implements JudgeService {
     private JudgeManager judgeManager;
 
     @Override
-    public QuestionSubmit doJudge(QuestionSubmit questionSubmit) {
+    @Transactional(rollbackFor = Exception.class)
+    public void doJudge(QuestionSubmit questionSubmit) {
         if (ObjectUtils.isEmpty(questionSubmit)) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "提交信息不存在");
         }
         Long questionId = questionSubmit.getQuestionId();
         Question question = questionFeignClient.getOne(questionId);
+        question.setId(questionId);
         if (ObjectUtils.isEmpty(question)) {
             throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "题目不存在");
         }
+        question.setSubmitNum(ObjectUtil.defaultIfNull(question.getSubmitNum(), 0) + 1);
         Long questionSubmitId = questionSubmit.getId();
         String code = questionSubmit.getCode();
         QuestionSubmitLanguageEnum languageType = QuestionSubmitLanguageEnum.getEnumByValue(questionSubmit.getLanguage());
@@ -90,9 +95,15 @@ public class  JudgeServiceImpl implements JudgeService {
         judgeContext.setLanguageType(QuestionSubmitLanguageEnum.getEnumByValue(questionSubmit.getLanguage()));
 
         JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext);
-        questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
+        // 暂时这么处理，后面根据代码沙箱返回结果处理
+        if ("成功".equals(judgeInfo.getMessage())) {
+            questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
+            question.setAcceptedNum(ObjectUtil.defaultIfNull(question.getAcceptedNum(), 0) + 1);
+        }else {
+            questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.FAILED.getValue());
+        }
+        questionFeignClient.updateQuestion(question);
         questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
         questionFeignClient.updateById(questionSubmitUpdate);
-        return questionFeignClient.selectById(questionSubmit.getId());
     }
 }

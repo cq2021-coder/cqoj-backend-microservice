@@ -21,6 +21,9 @@ public interface QuestionFeignClient {
     @GetMapping("/get/id")
     Question getOne(@RequestParam("questionId") Long questionId);
 
+    @PostMapping("/update/id")
+    void updateQuestion(@RequestBody Question question);
+
     @PostMapping("/question-submit/update")
     void updateById(@RequestBody QuestionSubmit questionSubmitUpdate);
 

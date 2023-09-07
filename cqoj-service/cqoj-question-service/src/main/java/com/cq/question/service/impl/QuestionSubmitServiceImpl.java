@@ -1,5 +1,7 @@
 package com.cq.question.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +11,7 @@ import com.cq.common.constants.MqConstant;
 import com.cq.common.exception.BusinessException;
 import com.cq.common.response.ResultCodeEnum;
 import com.cq.common.utils.SqlUtils;
+import com.cq.model.dto.questionsubmit.JudgeInfo;
 import com.cq.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.cq.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.cq.model.entity.Question;
@@ -17,6 +20,7 @@ import com.cq.model.entity.User;
 import com.cq.model.enums.QuestionSubmitLanguageEnum;
 import com.cq.model.enums.QuestionSubmitStatusEnum;
 import com.cq.model.vo.QuestionSubmitVO;
+import com.cq.model.vo.QuestionSubmitViewVO;
 import com.cq.question.mapper.QuestionSubmitMapper;
 import com.cq.question.service.QuestionService;
 import com.cq.question.service.QuestionSubmitService;
@@ -153,6 +157,25 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
                 .collect(Collectors.toList());
         questionSubmitVoPage.setRecords(questionSubmitVOList);
         return questionSubmitVoPage;
+    }
+
+
+    @Override
+    public Page<QuestionSubmitViewVO> listQuestionSubmitByPage(String title, String language, long pageIndex, long size) {
+        Page<QuestionSubmitViewVO> page = new Page<>(pageIndex, size);
+        long total = this.baseMapper.countQuestionSubmit(title, language);
+        page.setTotal(total);
+        if (size > 0) {
+            page.setPages(total / size);
+        }
+        List<QuestionSubmitViewVO> records = this.baseMapper.selectQuestionSubmit(title, language, pageIndex, size);
+        records.forEach(record -> {
+            JudgeInfo judgeInfo = JSONUtil.toBean(record.getJudgeInfo(), JudgeInfo.class);
+            record.setMessage(judgeInfo.getMessage());
+            record.setTime(ObjectUtil.defaultIfNull(judgeInfo.getTime(), 0) + "ms");
+        });
+        page.setRecords(records);
+        return page;
     }
 
 }
