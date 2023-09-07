@@ -2,7 +2,6 @@ package com.cq.judge.service;
 
 
 import com.cq.model.entity.QuestionSubmit;
-import com.cq.model.vo.QuestionSubmitVO;
 
 /**
  * 判题服务
@@ -15,7 +14,6 @@ public interface JudgeService {
      * 判题
      *
      * @param questionSubmit 提交题目数据
-     * @return {@link QuestionSubmitVO}
      */
-    QuestionSubmit doJudge(QuestionSubmit questionSubmit);
+    void doJudge(QuestionSubmit questionSubmit);
 }

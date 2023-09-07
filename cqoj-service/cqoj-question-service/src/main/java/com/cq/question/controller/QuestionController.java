@@ -1,34 +1,48 @@
 package com.cq.question.controller;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cq.client.feign.UserFeignClient;
 import com.cq.common.exception.BusinessException;
 import com.cq.common.request.DeleteRequest;
 import com.cq.common.response.CommonResponse;
 import com.cq.common.response.ResultCodeEnum;
+import com.cq.common.utils.CopyUtil;
 import com.cq.model.annotation.AuthCheck;
 import com.cq.model.dto.question.*;
+import com.cq.model.dto.questionsubmit.JudgeInfo;
 import com.cq.model.dto.questionsubmit.QuestionSubmitAddRequest;
-import com.cq.model.dto.questionsubmit.QuestionSubmitQueryRequest;
+import com.cq.model.dto.questionsubmit.QuestionSubmitQueryPageRequest;
 import com.cq.model.entity.Question;
 import com.cq.model.entity.QuestionSubmit;
 import com.cq.model.entity.User;
 import com.cq.model.enums.QuestionSubmitLanguageEnum;
+import com.cq.model.enums.QuestionSubmitStatusEnum;
 import com.cq.model.enums.UserRoleEnum;
+import com.cq.model.vo.JudgeVO;
 import com.cq.model.vo.QuestionManageVO;
-import com.cq.model.vo.QuestionSubmitVO;
+import com.cq.model.vo.QuestionSubmitViewVO;
 import com.cq.model.vo.QuestionVO;
 import com.cq.question.service.QuestionService;
 import com.cq.question.service.QuestionSubmitService;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RRateLimiter;
+import org.redisson.api.RateIntervalUnit;
+import org.redisson.api.RateType;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.List;
+
 
 /**
  * 题目接口
@@ -278,6 +292,8 @@ public class QuestionController {
         return CommonResponse.success(QuestionSubmitLanguageEnum.getValues());
     }
 
+    @Resource
+    private RedissonClient redisson;
 
     /**
      * 提交题目
@@ -292,18 +308,19 @@ public class QuestionController {
             throw new BusinessException(ResultCodeEnum.PARAMS_ERROR);
         }
         final User loginUser = userFeignClient.getLoginUser(session);
+        RRateLimiter rateLimiter = redisson.getRateLimiter(loginUser.getId().toString());
+        rateLimiter.trySetRate(RateType.PER_CLIENT, 1, 2, RateIntervalUnit.SECONDS);
+        if (!rateLimiter.tryAcquire()) {
+            return CommonResponse.error(ResultCodeEnum.FORBIDDEN_ERROR, "提交过于频繁，请稍后重试");
+        }
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return CommonResponse.success(questionSubmitId);
     }
 
     /**
      * 分页获取题目提交列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
-     *
-     * @param questionSubmitQueryRequest 题目提交查询请求
-     * @param session                    会话
-     * @return {@link CommonResponse}<{@link Page}<{@link QuestionSubmitVO}>>
      */
-    @PostMapping("/question-submit/list/page")
+    /*@PostMapping("/question-submit/list/page")
     public CommonResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpSession session) {
         long current = questionSubmitQueryRequest.getCurrent();
         long size = questionSubmitQueryRequest.getPageSize();
@@ -313,6 +330,30 @@ public class QuestionController {
         final User loginUser = userFeignClient.getLoginUser(session);
         // 返回脱敏信息
         return CommonResponse.success(questionSubmitService.getQuestionSubmitVoPage(questionSubmitPage, loginUser));
+    }*/
+    @GetMapping("/question-submit/list/page")
+    public CommonResponse<Page<QuestionSubmitViewVO>> listQuestionSubmitByPage(QuestionSubmitQueryPageRequest questionSubmitQueryRequest) {
+        long size = questionSubmitQueryRequest.getPageSize();
+        long pageIndex = (questionSubmitQueryRequest.getCurrent() - 1) * size;
+        String title = questionSubmitQueryRequest.getTitle();
+        String language = questionSubmitQueryRequest.getLanguage();
+        return CommonResponse.success(questionSubmitService.listQuestionSubmitByPage(title, language, pageIndex, size));
     }
 
+    @GetMapping("/question-submit/get/id")
+    public CommonResponse<JudgeVO> getJudgeResult(Long questionSubmitId) {
+        QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
+        if (ObjectUtil.isEmpty(questionSubmit)) {
+            return CommonResponse.success(new JudgeVO(), "数据为空");
+        }
+        Integer status = questionSubmit.getStatus();
+        if (QuestionSubmitStatusEnum.WAITING.getValue().equals(status)||QuestionSubmitStatusEnum.RUNNING.getValue().equals(status)) {
+            throw new BusinessException(ResultCodeEnum.NOT_FOUND_ERROR, "判题中");
+        }
+        JudgeVO judgeVO = CopyUtil.copy(questionSubmit, JudgeVO.class);
+        JudgeInfo judgeInfo = JSONUtil.toBean(questionSubmit.getJudgeInfo(), JudgeInfo.class);
+        judgeVO.setTime(ObjectUtil.defaultIfNull(judgeInfo.getTime(), 0) + "ms");
+        judgeVO.setMessage(judgeInfo.getMessage());
+        return CommonResponse.success(judgeVO);
+    }
 }

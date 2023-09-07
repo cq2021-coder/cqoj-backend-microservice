@@ -23,4 +23,37 @@
         user_id,create_time,update_time,
         is_delete
     </sql>
+    <select id="countQuestionSubmit" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM question_submit qs
+        LEFT JOIN `user` u ON qs.user_id = u.id
+        LEFT JOIN question q ON qs.question_id = q.id
+        <where>
+            qs.is_delete = 0
+            <if test="title !=null and title != ''">
+                AND q.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="language !=null and language != ''">
+                AND qs.language = #{language}
+            </if>
+        </where>
+    </select>
+    <select id="selectQuestionSubmit" resultType="com.cq.model.vo.QuestionSubmitViewVO">
+        SELECT q.id questionId,q.title questionTitle, qs.language, qs.judge_info judgeInfo, qs.create_time createTime,
+        u.user_name userName
+        FROM question_submit qs
+        LEFT JOIN `user` u ON qs.user_id = u.id
+        LEFT JOIN question q ON qs.question_id = q.id
+        <where>
+            qs.is_delete = 0
+            <if test="title !=null and title != ''">
+                AND q.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="language !=null and language != ''">
+                AND qs.language = #{language}
+            </if>
+        </where>
+        ORDER BY qs.create_time DESC
+        LIMIT #{pageIndex}, #{size};
+    </select>
 </mapper>

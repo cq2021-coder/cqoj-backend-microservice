@@ -22,7 +22,7 @@ public class JudgeInfo {
     private Long memory;
 
     /**
-     * 消耗时间（KB）
+     * 消耗时间（ms）
      */
     private Long time;
 }

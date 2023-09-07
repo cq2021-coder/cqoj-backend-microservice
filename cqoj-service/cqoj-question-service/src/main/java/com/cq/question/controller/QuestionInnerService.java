@@ -22,8 +22,15 @@ public class QuestionInnerService {
     @GetMapping("/get/id")
     public Question getOne(Long questionId) {
         return questionService.getOne(
-                Wrappers.lambdaQuery(Question.class).eq(Question::getId, questionId).select(Question::getJudgeCase, Question::getJudgeConfig)
+                Wrappers.lambdaQuery(Question.class)
+                        .eq(Question::getId, questionId)
+                        .select(Question::getJudgeCase, Question::getJudgeConfig, Question::getSubmitNum, Question::getAcceptedNum)
         );
+    }
+
+    @PostMapping("/update/id")
+    public void updateQuestion(@RequestBody Question question) {
+        questionService.updateById(question);
     }
 
     @PostMapping("/question-submit/update")
