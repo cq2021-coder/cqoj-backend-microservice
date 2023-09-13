@@ -26,6 +26,11 @@ spring:
   servlet:
     multipart:
       max-file-size: 5MB
+  rabbitmq:
+    listener:
+      simple:
+        # 开启手动确认消息
+        acknowledge-mode: manual
 mybatis-plus:
   global-config:
     db-config:
