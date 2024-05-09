@@ -19,6 +19,7 @@ import com.cq.model.entity.QuestionSubmit;
 import com.cq.model.entity.User;
 import com.cq.model.enums.QuestionSubmitLanguageEnum;
 import com.cq.model.enums.QuestionSubmitStatusEnum;
+import com.cq.model.enums.UserRoleEnum;
 import com.cq.model.vo.QuestionSubmitVO;
 import com.cq.model.vo.QuestionSubmitViewVO;
 import com.cq.question.mapper.QuestionSubmitMapper;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -161,14 +163,19 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
 
     @Override
-    public Page<QuestionSubmitViewVO> listQuestionSubmitByPage(String title, String language, long pageIndex, long size) {
+    public Page<QuestionSubmitViewVO> listQuestionSubmitByPage(String title, String language, long pageIndex, long size, User loginUser) {
         Page<QuestionSubmitViewVO> page = new Page<>(pageIndex, size);
         long total = this.baseMapper.countQuestionSubmit(title, language);
         page.setTotal(total);
         if (size > 0) {
             page.setPages(total / size);
         }
-        List<QuestionSubmitViewVO> records = this.baseMapper.selectQuestionSubmit(title, language, pageIndex, size);
+        List<QuestionSubmitViewVO> records = new ArrayList<>();
+        if (UserRoleEnum.ADMIN.equals(loginUser.getUserRole())) {
+            records = this.baseMapper.selectQuestionSubmit(title, language, pageIndex, size);
+        }else {
+            records = this.baseMapper.selectQuestionSubmitByUserId(title, language, pageIndex, size, loginUser.getId());
+        }
         records.forEach(record -> {
             JudgeInfo judgeInfo = JSONUtil.toBean(record.getJudgeInfo(), JudgeInfo.class);
             record.setMessage(judgeInfo.getMessage());
