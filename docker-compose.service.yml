@@ -1,0 +1,54 @@
+version: '1'
+services:
+  cqoj-backend-gateway:
+    container_name: cqoj-backend-gateway
+    build:
+      context: ./cqoj-backend-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8101:8101"
+    networks:
+      - cq_network
+
+  cqoj-backend-user-service:
+    container_name: cqoj-backend-user-service
+    build:
+      context: ./cqoj-backend-user-service
+      dockerfile: Dockerfile
+    ports:
+      - "8102:8102"
+    networks:
+      - cq_network
+    depends_on:
+      - cqoj-backend-gateway
+
+  cqoj-backend-question-service:
+    container_name: cqoj-backend-question-service
+    build:
+      context: ./cqoj-backend-question-service
+      dockerfile: Dockerfile
+    ports:
+      - "8103:8103"
+    networks:
+      - cq_network
+    depends_on:
+      - cqoj-backend-user-service
+      - cqoj-backend-gateway
+
+  cqoj-backend-judge-service:
+    container_name: cqoj-backend-judge-service
+    build:
+      context: ./cqoj-backend-judge-service
+      dockerfile: Dockerfile
+    ports:
+      - "8104:8104"
+    networks:
+      - cq_network
+    depends_on:
+      - cqoj-backend-user-service
+      - cqoj-backend-question-service
+      - cqoj-backend-gateway
+
+# 网络，不定义的话就是默认网络
+networks:
+  cq_network:

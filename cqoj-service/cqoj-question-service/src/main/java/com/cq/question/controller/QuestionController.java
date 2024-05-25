@@ -309,6 +309,7 @@ public class QuestionController {
         }
         final User loginUser = userFeignClient.getLoginUser(session);
         RRateLimiter rateLimiter = redisson.getRateLimiter(loginUser.getId().toString());
+        // 限制两秒只能提交一次
         rateLimiter.trySetRate(RateType.PER_CLIENT, 1, 2, RateIntervalUnit.SECONDS);
         if (!rateLimiter.tryAcquire()) {
             return CommonResponse.error(ResultCodeEnum.FORBIDDEN_ERROR, "提交过于频繁，请稍后重试");
@@ -332,12 +333,13 @@ public class QuestionController {
         return CommonResponse.success(questionSubmitService.getQuestionSubmitVoPage(questionSubmitPage, loginUser));
     }*/
     @GetMapping("/question-submit/list/page")
-    public CommonResponse<Page<QuestionSubmitViewVO>> listQuestionSubmitByPage(QuestionSubmitQueryPageRequest questionSubmitQueryRequest) {
+    public CommonResponse<Page<QuestionSubmitViewVO>> listQuestionSubmitByPage(QuestionSubmitQueryPageRequest questionSubmitQueryRequest, HttpSession session) {
+        User loginUser = userFeignClient.getLoginUser(session);
         long size = questionSubmitQueryRequest.getPageSize();
         long pageIndex = (questionSubmitQueryRequest.getCurrent() - 1) * size;
         String title = questionSubmitQueryRequest.getTitle();
         String language = questionSubmitQueryRequest.getLanguage();
-        return CommonResponse.success(questionSubmitService.listQuestionSubmitByPage(title, language, pageIndex, size));
+        return CommonResponse.success(questionSubmitService.listQuestionSubmitByPage(title, language, pageIndex, size, loginUser));
     }
 
     @GetMapping("/question-submit/get/id")

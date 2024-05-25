@@ -53,5 +53,5 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
     Page<QuestionSubmitVO> getQuestionSubmitVoPage(Page<QuestionSubmit> questionSubmitPage, User loginUser);
 
 
-    Page<QuestionSubmitViewVO> listQuestionSubmitByPage(String title, String language, long pageIndex, long size);
+    Page<QuestionSubmitViewVO> listQuestionSubmitByPage(String title, String language, long pageIndex, long size, User loginUser);
 }

@@ -19,7 +19,7 @@ public enum JudgeInfoMessageEnum {
      * 判题消息
      */
 
-    ACCEPTED("成功", "Accepted"),
+    ACCEPTED("答案正确", "Accepted"),
     WRONG_ANSWER("答案错误", "Wrong Answer"),
     COMPILE_ERROR("编译错误", "Compile Error"),
     MEMORY_LIMIT_EXCEEDED("内存溢出", "Memory Limit Exceeded"),
