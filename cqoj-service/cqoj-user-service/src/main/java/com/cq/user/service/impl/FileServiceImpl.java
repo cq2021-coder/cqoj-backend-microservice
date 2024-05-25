@@ -45,7 +45,7 @@ public class FileServiceImpl implements FileService {
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
             fileName = uuid + fileName;
             //按照当前日期，创建文件夹，上传到创建文件夹里面
-            //  2021/02/02/01.jpg
+            // 2021/02/02/01.jpg
             DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
             String timeUrl = df.format(new Date());
             fileName = timeUrl + "/" + System.currentTimeMillis() + "-" + fileName;

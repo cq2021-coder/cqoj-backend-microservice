@@ -96,7 +96,7 @@ public class  JudgeServiceImpl implements JudgeService {
 
         JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext);
         // 暂时这么处理，后面根据代码沙箱返回结果处理
-        if ("成功".equals(judgeInfo.getMessage())) {
+        if ("答案正确".equals(judgeInfo.getMessage())) {
             questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
             question.setAcceptedNum(ObjectUtil.defaultIfNull(question.getAcceptedNum(), 0) + 1);
         }else {

@@ -25,6 +25,8 @@ public interface QuestionSubmitMapper extends BaseMapper<QuestionSubmit> {
     long countQuestionSubmit(@Param("title") String title, @Param("language") String language);
 
     List<QuestionSubmitViewVO> selectQuestionSubmit(@Param("title") String title, @Param("language") String language, @Param("pageIndex") long pageIndex, @Param("size") long size);
+
+    List<QuestionSubmitViewVO> selectQuestionSubmitByUserId(@Param("title") String title, @Param("language") String language, @Param("pageIndex") long pageIndex, @Param("size") long size, @Param("userId") Long userId);
 }
 
 
