@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 public class RemoteCodeSandbox implements CodeSandbox {
 
     private static final String URL = "http://localhost:3040/codesandbox/execute";
-//    private static final String URL = "http://120.48.83.118:3040/codesandbox/execute";
 
 
     @Override
