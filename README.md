@@ -13,6 +13,10 @@ mvn clean
 ```bash
 docker compose -f docker-compose.env.yml -f docker-compose.service.yml up -d
 ```
+如果想停止服务，执行下面这个命令即可：
+```bash
+docker compose -f docker-compose.env.yml -f docker-compose.service.yml stop 
+```
 
 ### 3）前端代码修改
 只需要将地址改为图示地址即可
