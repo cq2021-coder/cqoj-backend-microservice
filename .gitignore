@@ -34,3 +34,7 @@ build/
 **/.mvn
 **/application-prod.yml
 **/application-test.yml
+.mysql-data
+.nacos-data
+.rabbitmq-data
+.redis-data

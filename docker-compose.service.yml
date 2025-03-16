@@ -1,34 +1,57 @@
-version: '1'
+version: '3.8'
 services:
   cqoj-backend-gateway:
     container_name: cqoj-backend-gateway
     build:
-      context: ./cqoj-backend-gateway
+      context: ./cqoj-gateway
       dockerfile: Dockerfile
     ports:
-      - "8101:8101"
+      - "3050:3050"
+    networks:
+      - cq_network
+    depends_on:
+      nacos:
+        condition: service_healthy  # 等待 nacos 健康
+
+  cqoj-codesandbox-service:
+    container_name: cqoj-codesandbox-service
+    build:
+      context: ./cqoj-service/cqoj-code-sandbox
+      dockerfile: Dockerfile
+    ports:
+      - "3040:3040"
     networks:
       - cq_network
 
   cqoj-backend-user-service:
-    container_name: cqoj-backend-user-service
+    container_name: cqoj-user-service
     build:
-      context: ./cqoj-backend-user-service
+      context: ./cqoj-service/cqoj-user-service
       dockerfile: Dockerfile
     ports:
-      - "8102:8102"
+      - "3051:3051"
     networks:
       - cq_network
     depends_on:
-      - cqoj-backend-gateway
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      cqoj-backend-gateway:
+        condition: service_started
+
 
   cqoj-backend-question-service:
     container_name: cqoj-backend-question-service
     build:
-      context: ./cqoj-backend-question-service
+      context: ./cqoj-service/cqoj-question-service
       dockerfile: Dockerfile
     ports:
-      - "8103:8103"
+      - "3052:3052"
     networks:
       - cq_network
     depends_on:
@@ -38,15 +61,16 @@ services:
   cqoj-backend-judge-service:
     container_name: cqoj-backend-judge-service
     build:
-      context: ./cqoj-backend-judge-service
+      context: ./cqoj-service/cqoj-judge-service
       dockerfile: Dockerfile
     ports:
-      - "8104:8104"
+      - "3053:3053"
     networks:
       - cq_network
     depends_on:
       - cqoj-backend-user-service
       - cqoj-backend-question-service
+      - cqoj-codesandbox-service
       - cqoj-backend-gateway
 
 # 网络，不定义的话就是默认网络

@@ -1,14 +1,14 @@
 # 基础镜像
-FROM openjdk:8-jdk-alpine
+FROM openjdk:17-jdk
 
 # 指定工作目录
 WORKDIR /app
 
 # 将 jar 包添加到工作目录
-ADD target/cqoj-backend-question-service-0.0.1-SNAPSHOT.jar .
+ADD target/cqoj-question-service-0.0.1-SNAPSHOT.jar .
 
 # 暴露端口
-EXPOSE 8103
+EXPOSE 3052
 
 # 启动命令
-ENTRYPOINT ["java","-jar","/app/cqoj-backend-question-service-0.0.1-SNAPSHOT.jar","--spring.profiles.active=prod"]
+ENTRYPOINT ["java","-jar","/app/cqoj-question-service-0.0.1-SNAPSHOT.jar","--spring.profiles.active=dev"]

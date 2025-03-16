@@ -16,6 +16,7 @@
         <module>cqoj-user-service</module>
         <module>cqoj-question-service</module>
         <module>cqoj-judge-service</module>
+        <module>cqoj-code-sandbox</module>
     </modules>
 
     <properties>
