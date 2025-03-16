@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class RemoteCodeSandbox implements CodeSandbox {
 
-    private static final String URL = "http://localhost:3040/codesandbox/execute";
+    private static final String URL = "http://cqoj-codesandbox-service:3040/codesandbox/execute";
 
 
     @Override
