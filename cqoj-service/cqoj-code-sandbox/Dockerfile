@@ -1,5 +1,11 @@
 # 基础镜像
-FROM openjdk:17-jdk
+FROM openjdk:17-slim
+
+# 安装 g++ 编译器
+RUN sed -i 's@//.*archive.ubuntu.com@//mirrors.aliyun.com@g' /etc/apt/sources.list
+RUN apt-get update
+RUN apt-get install -y g++
+RUN rm -rf /var/lib/apt/lists/*
 
 # 指定工作目录
 WORKDIR /app
